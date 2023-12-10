@@ -11,6 +11,8 @@ from pymoo.decomposition.asf import ASF
 
 import matplotlib.pyplot as plt
 
+# Documentation: https://pymoo.org/getting_started/part_2.html
+
 # Inputs from GUI: 
 # n_var, n_obj, n_ieq_constr, xl, xu, f1, f2, g1, g2
 # NSGA2 + all params (there will be one more algo with other params)
