@@ -63,8 +63,8 @@ class AlgorithmConfigurationNSGA2():
 
     Attributes:
         pop_size (int):                   Population size
-        n_offsprings (int):               Number of offsprings at one iteration
-        crossover_prob (float):           N
+        n_offsprings (int):               Number of offspring that are created through mating.
+        crossover_prob (float):           Crossover operator will create a different number of offsprings dependent on the implementation.
         crossover_eta (int):              N
         mutation_eta (int):               N
         eliminate_duplicates (bool):      N
@@ -104,6 +104,15 @@ class Problem(ElementwiseProblem):
         # Calculate funtion results
         out["F"] = [fun(*x) for fun in self._obj_fcn]
         out["G"] = [fun(*x) for fun in self._constrains]
+
+# # Multiprocessing visualization
+# def visualization(F, i):
+#     plt.figure(figsize=(7, 5))
+#     plt.scatter(F[:, 0], F[:, 1], s=30, facecolors='none', edgecolors='blue')
+#     plt.scatter(F[i, 0], F[i, 1], marker="x", color="red", s=200)       # solution
+#     plt.title("Objective Space")
+#     plt.show()
+
 
 # test code - this will be at GUI or at GUI communication
 if __name__ == "__main__":
@@ -180,6 +189,8 @@ if __name__ == "__main__":
     print("Best regarding ASF: Point \ni = %s\nF = %s" % (i, F[i]))
 
     # Visualizing
+    # TODO: multiprocessing seems not required
+    # TODO: consider 1, 2, 3 objectives
     xl, xu = problem.bounds()
     plt.figure(figsize=(7, 5))
     plt.scatter(X[:, 0], X[:, 1], s=30, facecolors='none', edgecolors='r')
@@ -187,10 +198,13 @@ if __name__ == "__main__":
     plt.xlim(xl[0], xu[0])
     plt.ylim(xl[1], xu[1])
     plt.title("Design Space")
+    plt.ion()
     plt.show()
 
     plt.figure(figsize=(7, 5))
     plt.scatter(F[:, 0], F[:, 1], s=30, facecolors='none', edgecolors='blue')
     plt.scatter(F[i, 0], F[i, 1], marker="x", color="red", s=200)       # solution
     plt.title("Objective Space")
+    plt.ion()
     plt.show()
+    input("Press [enter] to continue.")
