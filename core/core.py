@@ -1,6 +1,8 @@
 import numpy as np
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.algorithms.moo.nsga2 import NSGA2
+from pymoo.algorithms.moo.unsga3 import UNSGA3
+from pymoo.algorithms.moo.ctaea import CTAEA
 from pymoo.operators.crossover.sbx import SBX
 from pymoo.operators.mutation.pm import PM
 from pymoo.operators.sampling.rnd import FloatRandomSampling
@@ -77,7 +79,7 @@ class AlgorithmConfiguration():
     """This class holds information about solving algorithm
 
     Attributes:
-        algo_type (str):                  Solver algorithm type. Supoorted values: NSGA2, U-NSGA-III, MOEA/D.
+        algo_type (str):                  Solver algorithm type. Supoorted values: NSGA2, U-NSGA-III, CTAEA.
         n_obj (int):                      Number of objective functions. Dublicate from problem config!
         ref_dirs_type (str):              Type of reference dir's. Supported values: "energy", "uniform"
         n_partitions (int):               Number of partitions (required for "uniform" ref_dir).
@@ -238,10 +240,27 @@ def init_algo(config: AlgorithmConfiguration):
         case "U-NSGA-III":
             # U-NSGA-III algorithm
             ref_dirs = get_reference_directions(config.ref_dirs_type, config.n_obj, n_partitions=config.n_partitions)
+            algorithm = UNSGA3(
+                            ref_dirs,
+                            pop_size=config.pop_size,
+                            n_offsprings=config.n_offsprings,
+                            sampling=FloatRandomSampling(),
+                            crossover=SBX(prob=config.crossover_prob, eta=config.crossover_eta),
+                            mutation=(PM(eta=config.mutation_eta) if config.mutation_en else None),
+                            eliminate_duplicates=config.eliminate_duplicates
+                        )
             pass
-        case "MOEA/D":
-            # MOEA-D algorithm
-            ref_dirs = get_reference_directions(config.ref_dirs_type, config.n_obj, config.n_points, seed=1)
+        case "CTAEA":
+            # CTAEA algorithm
+            # ref_dirs = get_reference_directions(config.ref_dirs_type, config.n_obj, config.n_points, seed=1) # TODO: opton not supported
+            ref_dirs = get_reference_directions(config.ref_dirs_type, config.n_obj, n_partitions=config.n_partitions)
+            algorithm = CTAEA(
+                            ref_dirs=ref_dirs,
+                            sampling=FloatRandomSampling(),
+                            crossover=SBX(prob=config.crossover_prob, eta=config.crossover_eta),
+                            mutation=(PM(eta=config.mutation_eta) if config.mutation_en else None),
+                            eliminate_duplicates=config.eliminate_duplicates
+                        )
             pass
         case _:
             # unsupported algorithm value
@@ -262,7 +281,7 @@ if __name__ == "__main__":
     problem_config.xl = np.array([-2, -2])
     problem_config.xu = np.array([2, 2])
 
-    # TODO: here some parsing may be required
+    # TODO: here some parsing may be required. Pass info from GUI as str array
     # TODO: wrap in try catch and send error message to GUI at catch (maybe all core)
     # f1 = 100 * (x[0]**2 + x[1]**2)
     f1 = lambdify(['x0', 'x1'], "100 * (x0**2 + x1**2)")
@@ -280,7 +299,7 @@ if __name__ == "__main__":
     # Algorithm configuration
     # TODO: expect here branching based on algorithm
     algo_config = AlgorithmConfiguration()
-    algo_config.algo_type = "NSGA2"
+    algo_config.algo_type = "CTAEA"
     algo_config.n_obj = problem_config.n_obj
     algo_config.n_partitions = 12
     algo_config.n_points = 90
