@@ -24,7 +24,7 @@ class ProblemFrame(customtkinter.CTkFrame):
 
         # Layout configuration
         self.grid_columnconfigure((0, 1, 2, 3, 4, 5), weight=1)
-        self.grid_rowconfigure((1,3), weight=1)
+        self.grid_rowconfigure(3, weight=1)
 
         self.frame_label = customtkinter.CTkLabel(self, text="Optimization Problem", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.frame_label.grid(row=0, column=0, columnspan=6, padx=20, pady=10, sticky="wne")
@@ -39,7 +39,7 @@ class ProblemFrame(customtkinter.CTkFrame):
         self.constr_label = customtkinter.CTkLabel(self, text="Number of constrains (le):", font=customtkinter.CTkFont(size=16))
         self.constr_label.grid(row=1, column=2, rowspan=1, padx=(10, 10), pady=(0, 10), sticky="wne")
 
-        # Input labels
+        # Input fields
         self.var_entry = customtkinter.CTkEntry(self, font=customtkinter.CTkFont(size=16))
         self.var_entry.grid(row=2, column=0, rowspan=1, padx=(10, 0), pady=(0, 10), sticky="wne")
         self.var_entry.bind("<Return>", self.var_cnt_changed)
@@ -54,23 +54,33 @@ class ProblemFrame(customtkinter.CTkFrame):
 
         # Input tables
         var_columns = ("var", "xl", "xu")
-        self.var_table = tb.TableView(self, columns=var_columns, show="headings", height=20)
+        self.var_table = tb.TableView(self, columns=var_columns, show="headings", height=6)
         self.var_table.grid(row=3, column=0, padx=(10, 0), pady=(0, 10), sticky="wnse")
+
+        self.var_table.column("var",anchor=CENTER, stretch=NO, width=20)
+        self.var_table.column("xl",anchor=CENTER, stretch=NO, width=20)
+        self.var_table.column("xu",anchor=CENTER, stretch=NO, width=20)
 
         self.var_table.heading("var", text='Var')
         self.var_table.heading("xl", text='Lower lim')
         self.var_table.heading("xu", text='Higher lim')
 
         obj_columns = ("obj", "equation")
-        self.obj_table = tb.TableView(self, columns=obj_columns, show="headings", height=20)
+        self.obj_table = tb.TableView(self, columns=obj_columns, show="headings", height=6)
         self.obj_table.grid(row=3, column=1, padx=(10, 0), pady=(0, 10), sticky="wnse")
+
+        self.obj_table.column("obj",anchor=CENTER, stretch=NO, width=20)
+        self.obj_table.column("equation",anchor=CENTER, stretch=NO, width=50)
 
         self.obj_table.heading("obj", text='Objective')
         self.obj_table.heading("equation", text='Function')
 
         constr_columns = ("constr", "equation")
-        self.constr_table = tb.TableView(self, columns=constr_columns, show="headings", height=20)
+        self.constr_table = tb.TableView(self, columns=constr_columns, show="headings", height=6)
         self.constr_table.grid(row=3, column=2, padx=(10, 10), pady=(0, 10), sticky="wnse")
+
+        self.constr_table.column("constr",anchor=CENTER, stretch=NO, width=20)
+        self.constr_table.column("equation",anchor=CENTER, stretch=NO, width=50)
 
         self.constr_table.heading("constr", text='Constrain')
         self.constr_table.heading("equation", text='Function')
