@@ -57,9 +57,9 @@ class ProblemFrame(customtkinter.CTkFrame):
         self.var_table = tb.TableView(self, columns=var_columns, show="headings", height=6)
         self.var_table.grid(row=3, column=0, padx=(10, 0), pady=(0, 10), sticky="wnse")
 
-        self.var_table.column("var",anchor=CENTER, stretch=NO, width=20)
-        self.var_table.column("xl",anchor=CENTER, stretch=NO, width=20)
-        self.var_table.column("xu",anchor=CENTER, stretch=NO, width=20)
+        self.var_table.column("var",anchor=CENTER, stretch=NO, width=40)
+        self.var_table.column("xl",anchor=CENTER, width=80)
+        self.var_table.column("xu",anchor=CENTER, width=80)
 
         self.var_table.heading("var", text='Var')
         self.var_table.heading("xl", text='Lower lim')
@@ -69,8 +69,8 @@ class ProblemFrame(customtkinter.CTkFrame):
         self.obj_table = tb.TableView(self, columns=obj_columns, show="headings", height=6)
         self.obj_table.grid(row=3, column=1, padx=(10, 0), pady=(0, 10), sticky="wnse")
 
-        self.obj_table.column("obj",anchor=CENTER, stretch=NO, width=20)
-        self.obj_table.column("equation",anchor=CENTER, stretch=NO, width=50)
+        self.obj_table.column("obj",anchor=CENTER, stretch=NO, width=65)
+        self.obj_table.column("equation",anchor=CENTER, width=50)
 
         self.obj_table.heading("obj", text='Objective')
         self.obj_table.heading("equation", text='Function')
@@ -79,11 +79,15 @@ class ProblemFrame(customtkinter.CTkFrame):
         self.constr_table = tb.TableView(self, columns=constr_columns, show="headings", height=6)
         self.constr_table.grid(row=3, column=2, padx=(10, 10), pady=(0, 10), sticky="wnse")
 
-        self.constr_table.column("constr",anchor=CENTER, stretch=NO, width=20)
-        self.constr_table.column("equation",anchor=CENTER, stretch=NO, width=50)
+        self.constr_table.column("constr",anchor=CENTER, stretch=NO, width=60)
+        self.constr_table.column("equation",anchor=CENTER, width=50)
 
         self.constr_table.heading("constr", text='Constrain')
         self.constr_table.heading("equation", text='Function')
+
+        self.var_table.insert('', END, iid = 0, values = ["x0", 1, 2])
+        self.obj_table.insert('', END, iid = 0, values = ["f0", "x0 + x0 + 2*x0 + x0 + x0 + 2*x0"])
+        self.constr_table.insert('', END, iid = 0, values = ["f0", "x0 + x0 + 2*x0 + x0 + x0 + 2*x0"])
 
 
     def var_cnt_changed(self, event):

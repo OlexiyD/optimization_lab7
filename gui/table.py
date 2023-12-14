@@ -9,6 +9,7 @@ class TableView(ttk.Treeview):
 
         # Coloring of table
         style = ttk.Style()
+        style.theme_use("clam")
         style.configure("Treeview",
                         background="#2a2d2e",
                         foreground="white",
@@ -21,7 +22,8 @@ class TableView(ttk.Treeview):
         style.configure("Treeview.Heading",
                         background="#565b5e",
                         foreground="white",
-                        relief="flat")
+                        relief="flat",
+                        font=("Helvetica", 9))
         style.map("Treeview.Heading",
                   background=[('active', '#3484F0')])
 
