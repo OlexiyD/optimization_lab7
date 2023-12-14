@@ -128,7 +128,7 @@ class SolutionFrame(customtkinter.CTkFrame):
         self.frame_label.grid(row=0, column=0, padx=20, pady=10, sticky="wne")
 
         self.result_label = customtkinter.CTkLabel(self, text="Solution", font=customtkinter.CTkFont(size=16), 
-                                                   fg_color="grey", text_color="black", corner_radius=10, anchor="nw")
+                                                   fg_color="#343638", text_color="#c7cfda", corner_radius=10, anchor="nw")
         self.result_label.grid(row=1, column=0, rowspan=5, padx=10, pady=0, sticky="wsne")
 
         self.solve_button = customtkinter.CTkButton(self, text="Optimize", command=self.button_callbck)
@@ -206,19 +206,43 @@ class AlgorithmFrame(customtkinter.CTkFrame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
-        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure((0, 1, 2, 3, 4, 5, 6), weight=1)
+        self.grid_rowconfigure(3, weight=1)
 
         self.frame_label = customtkinter.CTkLabel(self, text="Algorithm configuration", font=customtkinter.CTkFont(size=20, weight="bold"))
-        self.frame_label.grid(row=0, column=0, padx=20, pady=10, sticky="wne")
+        self.frame_label.grid(row=0, column=0, columnspan=2, padx=20, pady=10, sticky="wne")
 
-        # self.checkbox_1 = customtkinter.CTkCheckBox(self, text="checkbox 1")
-        # self.checkbox_1.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="w")
+        # Controls
+        algos = ["NSGA2", "U-NSGA-III", "CTAEA"]
+        self.algo_sel = customtkinter.CTkComboBox(self, values=algos)
+        self.algo_sel.grid(row=1, column=0, columnspan=1, padx=(20, 5), pady=(0, 10), sticky="wnes")
 
-        # self.button = customtkinter.CTkButton(self, text="my button", command=self.button_callbck2)
-        # self.button.grid(row=1, column=0, padx=20, pady=20)
+        ref_dirs = ["energy", "uniform"]
+        self.ref_dirs = customtkinter.CTkComboBox(self, values=ref_dirs)
+        self.ref_dirs.grid(row=1, column=1, columnspan=1, padx=(5, 20), pady=(0, 10), sticky="wnes")
 
-    # def button_callbck2(self):
-    #     print("button clicked !!!!")
+        self.rem_duplicates = customtkinter.CTkCheckBox(self, text="Eliminate duplicates enable", onvalue=True, offvalue=False)
+        self.rem_duplicates.grid(row=2, column=1, columnspan=2, padx=(20, 20), pady=(0, 10), sticky="wnes")
+
+        self.pop_size_label = customtkinter.CTkLabel(self, text="Population size:", font=customtkinter.CTkFont(size=16))
+        self.pop_size_label.grid(row=3, column=0, rowspan=1, padx=(20, 5), pady=(0, 10), sticky="wnes")
+        self.pop_size_entry = customtkinter.CTkEntry(self, font=customtkinter.CTkFont(size=16))
+        self.pop_size_entry.grid(row=3, column=1, rowspan=1, padx=(5, 20), pady=(0, 10), sticky="wnes")
+
+        self.n_part_label = customtkinter.CTkLabel(self, text="Number of pertitions:", font=customtkinter.CTkFont(size=16))
+        self.n_part_label.grid(row=4, column=0, rowspan=1, padx=(20, 5), pady=(0, 10), sticky="wnes")
+        self.n_part_entry = customtkinter.CTkEntry(self, font=customtkinter.CTkFont(size=16))
+        self.n_part_entry.grid(row=4, column=1, rowspan=1, padx=(5, 20), pady=(0, 10), sticky="wnes")
+
+        self.n_offsprings_label = customtkinter.CTkLabel(self, text="Number of offsprings:", font=customtkinter.CTkFont(size=16))
+        self.n_offsprings_label.grid(row=5, column=0, rowspan=1, padx=(20, 5), pady=(0, 10), sticky="wnes")
+        self.n_offsprings_entry = customtkinter.CTkEntry(self, font=customtkinter.CTkFont(size=16))
+        self.n_offsprings_entry.grid(row=5, column=1, rowspan=1, padx=(5, 20), pady=(0, 10), sticky="wnes")
+
+        self.n_points_label = customtkinter.CTkLabel(self, text="Number of points:", font=customtkinter.CTkFont(size=16))
+        self.n_points_label.grid(row=6, column=0, rowspan=1, padx=(20, 5), pady=(0, 10), sticky="wnes")
+        self.n_points_entry = customtkinter.CTkEntry(self, font=customtkinter.CTkFont(size=16))
+        self.n_points_entry.grid(row=6, column=1, rowspan=1, padx=(5, 20), pady=(0, 10), sticky="wnes")
 
 class StatusFrame(customtkinter.CTkFrame):
     """This class implements output
@@ -240,7 +264,7 @@ class StatusFrame(customtkinter.CTkFrame):
         self.frame_label.grid(row=0, column=0, padx=20, pady=10, sticky="wne")
 
         # Create textbox
-        self.textbox = customtkinter.CTkTextbox(self, font=customtkinter.CTkFont(size=16), fg_color="grey")
+        self.textbox = customtkinter.CTkTextbox(self, font=customtkinter.CTkFont(size=16), fg_color="#343638", text_color="#c7cfda")
         self.textbox.grid(row=1, column=0, padx=10, pady=(0, 10), sticky="nsew")
 
 class TopFrame(customtkinter.CTkFrame):
