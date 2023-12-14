@@ -10,6 +10,7 @@ from pymoo.termination import get_termination
 from pymoo.optimize import minimize
 from pymoo.util.ref_dirs import get_reference_directions
 from pymoo.decomposition.asf import ASF
+from pymoo.visualization.scatter import Scatter
 
 import matplotlib.pyplot as plt
 import colorama
@@ -21,20 +22,7 @@ from sympy import lambdify
 
 # Documentation: https://pymoo.org/getting_started/part_2.html
 
-# Inputs from GUI: 
-# n_var, n_obj, n_ieq_constr, xl, xu, f1, f2, g1, g2
-# NSGA2 + all params (there will be one more algo with other params)
-# weights
-
-# Output to GUI:
-# X - length of n_var (simply few numbers)
-# F - length of n_obj (simply few numbers)
-
-# TODO: with lambdify string can be coverted to function. Order of variables matter!
-# Ex.: f2 = lambdify(['z', 'x', 'y'], "x*2 +y*10 + z*40") # can take both strings and symbolic objects
-# Note: should teke same numbers of inputs as length of first arg in lambdify (even if not all of them are used!)
-
-# Configuration package for problem
+# Configuration package for optimization
 @dataclass
 class OptimizationConfiguration():
     """This class holds information about optimization configuration
@@ -74,7 +62,7 @@ class ProblemConfiguration():
     objective_fcn: list[Callable] = None
     constrains: list[Callable] = None
 
-# Configuration package for NSGA2 algorithm
+# Configuration package for algorithm
 @dataclass
 class AlgorithmConfiguration():
     """This class holds information about solving algorithm
@@ -171,18 +159,8 @@ def visualize(problem: Problem, X: np.ndarray, F: np.ndarray, solution_idx: int)
             plt.title("Design Space")
             plt.grid(visible=True)
         case 3:
-            # TODO: unoperational, test
-            plt.axes(projection ='3d')
-            plt.scatter(X[:, 0], X[:, 1], X[:, 1], s=30, facecolors='none', edgecolors='r')
-            plt.scatter(X[solution_idx, 0], X[solution_idx, 1], X[solution_idx, 1], marker="x", color="green", s=200)
-            plt.xlim(xl[0], xu[0])
-            plt.ylim(xl[1], xu[1])
-            plt.xlabel("x0")
-            plt.ylabel("x1")
-            plt.title("Design Space")
-            plt.grid(visible=True)
             pass
-        case default:
+        case _:
             #
             pass
 
@@ -205,21 +183,20 @@ def visualize(problem: Problem, X: np.ndarray, F: np.ndarray, solution_idx: int)
             plt.grid(visible=True)
         case 3:
             # TODO: unoperational
-            plt.scatter(F[:, 0], F[:, 1], s=30, facecolors='none', edgecolors='blue')
-            plt.scatter(F[solution_idx, 0], F[solution_idx, 1], marker="x", color="red", s=200)
-            plt.xlabel("f0")
-            plt.ylabel("f1")
-            plt.title("Objective Space")
-            plt.grid(visible=True)
+            plot = Scatter()
+            plot.add(F)
+            plot.add(F[solution_idx], color="red")
+            plot.show()
             pass
-        case default:
-            #
+        case _:
+            plot = Scatter(tight_layout=True)
+            plot.add(F, s=10)
+            plot.add(F[solution_idx], s=30, color="red")
+            plot.show()
             pass
 
     plt.ion()
     plt.show()
-
-    # Option for single criteria
 
 def init_algo(config: AlgorithmConfiguration):
     """Function to intialize solver algorithm

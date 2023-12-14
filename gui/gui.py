@@ -151,37 +151,52 @@ class SolutionFrame(customtkinter.CTkFrame):
             problem_config.n_var = int(self.master.problem_frame.var_entry.get())
             problem_config.n_obj = int(self.master.problem_frame.obj_entry.get())
             problem_config.n_ieq_constr = int(self.master.problem_frame.constr_entry.get())
-            problem_config.xl = np.array([-2, -2])
-            problem_config.xu = np.array([2, 2])
-            f1 = lambdify(['x0', 'x1'], "100 * (x0**2 + x1**2)")
-            # f2 = (x[0]-1)**2 + x[1]**2
-            f2 = lambdify(['x0', 'x1'], "(x0-1)**2 + x1**2")
 
-            # g1 = 2*(x[0]-0.1) * (x[0]-0.9) / 0.18
-            g1 = lambdify(['x0', 'x1'], "2*(x0-0.1) * (x0-0.9) / 0.18")
-            # g2 = - 20*(x[0]-0.4) * (x[0]-0.6) / 4.8
-            g2 = lambdify(['x0', 'x1'], "- 20*(x0-0.4) * (x0-0.6) / 4.8")
+            # Get limits from variable table
+            tmp_xl_array = [0]*problem_config.n_var
+            tmp_xu_array = [0]*problem_config.n_var
+            vars_names = ['']*problem_config.n_var
+            for row_idx in range(problem_config.n_var):
+                row = self.master.problem_frame.var_table.item(row_idx, 'values')
+                vars_names[row_idx] = str(row[0])
+                tmp_xl_array[row_idx] = int(row[1])
+                tmp_xu_array[row_idx] = int(row[2])
 
-            problem_config.objective_fcn = [f1, f2]
-            problem_config.constrains = [g1, g2]
-            # TODO: implement transition
+            problem_config.xl = np.array(tmp_xl_array)
+            problem_config.xu = np.array(tmp_xu_array)
+
+            # Get objectives TODO add weight
+            tmp_obj_array = ['']*problem_config.n_obj
+            tmp_weights_array = ['']*problem_config.n_obj
+            for row_idx in range(problem_config.n_obj):
+                row = self.master.problem_frame.obj_table.item(row_idx, 'values')
+                tmp_obj_array[row_idx] = lambdify(vars_names, str(row[1]))
+                tmp_weights_array[row_idx] = float(row[2])
+
+            # Get constrains
+            tmp_constr_array = ['']*problem_config.n_ieq_constr
+            for row_idx in range(problem_config.n_ieq_constr):
+                row = self.master.problem_frame.constr_table.item(row_idx, 'values')
+                tmp_constr_array[row_idx] = lambdify(vars_names, str(row[1]))
+
+            problem_config.objective_fcn = tmp_obj_array
+            problem_config.constrains = tmp_constr_array
+
 
             algo_config = core.AlgorithmConfiguration()
-            algo_config.algo_type = "CTAEA"
+            algo_config.algo_type = str(self.master.algorithm_frame.algo_sel.get())
             algo_config.n_obj = problem_config.n_obj
-            algo_config.n_partitions = 12
-            algo_config.n_points = 90
-            algo_config.ref_dirs_type = "uniform"
-            algo_config.pop_size = 40
-            algo_config.eliminate_duplicates = True
-            # TODO: implement transition
+            algo_config.n_partitions = int(self.master.algorithm_frame.n_part_entry.get())
+            algo_config.n_points = int(self.master.algorithm_frame.n_points_entry.get())
+            algo_config.ref_dirs_type = str(self.master.algorithm_frame.ref_dirs.get())
+            algo_config.pop_size = int(self.master.algorithm_frame.pop_size_entry.get())
+            algo_config.eliminate_duplicates = (True) if (int(self.master.algorithm_frame.rem_duplicates.get())) else (False)
 
             opt_config = core.OptimizationConfiguration()
             opt_config.termination_n_gen = 60 # Hardcoded
             opt_config.save_history = False
             opt_config.verbose = False
-            opt_config.weights = np.array([0.2, 0.8])
-            # TODO: implement transition
+            opt_config.weights = np.array(tmp_weights_array)
 
             # Instanciating object of problem class
             problem = core.Problem(problem_config)
