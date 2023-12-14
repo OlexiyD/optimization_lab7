@@ -1,6 +1,6 @@
 import tkinter.ttk as ttk
 
-class Tableview(ttk.Treeview):
+class TableView(ttk.Treeview):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -97,7 +97,7 @@ class EntryPopup(ttk.Entry):
 #          values = line)
 # columns = ("name", "age", "salary")
 
-# tree= Tableview(root, columns=columns, show="headings", height=20)
+# tree= TableView(root, columns=columns, show="headings", height=20)
 # tree.pack(padx = 5, pady = 5)
 
 # tree.heading('name', text='Name')

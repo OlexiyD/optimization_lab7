@@ -1,8 +1,11 @@
 import sys
+import colorama
 from tkinter import *
 import customtkinter
+from pymoo.decomposition.asf import ASF
 import core.core as core
 import gui.helper as hp
+import gui.table as tb
 
 # TODO: remove. Link to tkinter site: https://customtkinter.tomschimansky.com/
 
@@ -19,19 +22,68 @@ class ProblemFrame(customtkinter.CTkFrame):
     def __init__(self, master, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
-        self.grid_columnconfigure(0, weight=1)
+        # Layout configuration
+        self.grid_columnconfigure((0, 1, 2, 3, 4, 5), weight=1)
+        self.grid_rowconfigure((1,3), weight=1)
 
         self.frame_label = customtkinter.CTkLabel(self, text="Optimization Problem", font=customtkinter.CTkFont(size=20, weight="bold"))
-        self.frame_label.grid(row=0, column=0, padx=20, pady=10, sticky="wne")
+        self.frame_label.grid(row=0, column=0, columnspan=6, padx=20, pady=10, sticky="wne")
 
-        # self.checkbox_1 = customtkinter.CTkCheckBox(self, text="checkbox 1")
-        # self.checkbox_1.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="w")
+        # Variables, objectives and constrains count
+        self.var_label = customtkinter.CTkLabel(self, text="Number of variables:", font=customtkinter.CTkFont(size=16))
+        self.var_label.grid(row=1, column=0, rowspan=1, padx=(10, 0), pady=(0, 10), sticky="wne")
 
-        # self.button = customtkinter.CTkButton(self, text="my button", command=self.button_callbck2)
-        # self.button.grid(row=1, column=0, padx=20, pady=20)
+        self.obj_label = customtkinter.CTkLabel(self, text="Number of objectives (min):", font=customtkinter.CTkFont(size=16))
+        self.obj_label.grid(row=1, column=1, rowspan=1, padx=(10, 0), pady=(0, 10), sticky="wne")
 
-    # def button_callbck2(self):
-    #     print("button clicked !!!!")
+        self.constr_label = customtkinter.CTkLabel(self, text="Number of constrains (le):", font=customtkinter.CTkFont(size=16))
+        self.constr_label.grid(row=1, column=2, rowspan=1, padx=(10, 10), pady=(0, 10), sticky="wne")
+
+        # Input labels
+        self.var_entry = customtkinter.CTkEntry(self, font=customtkinter.CTkFont(size=16))
+        self.var_entry.grid(row=2, column=0, rowspan=1, padx=(10, 0), pady=(0, 10), sticky="wne")
+        self.var_entry.bind("<Return>", self.var_cnt_changed)
+
+        self.obj_entry = customtkinter.CTkEntry(self, font=customtkinter.CTkFont(size=16))
+        self.obj_entry.grid(row=2, column=1, rowspan=1, padx=(10, 0), pady=(0, 10), sticky="wne")
+        self.obj_entry.bind("<Return>", self.obj_cnt_changed)
+
+        self.constr_entry = customtkinter.CTkEntry(self, font=customtkinter.CTkFont(size=16))
+        self.constr_entry.grid(row=2, column=2, rowspan=1, padx=(10, 10), pady=(0, 10), sticky="wne")
+        self.constr_entry.bind("<Return>", self.constr_cnt_changed)
+
+        # Input tables
+        var_columns = ("var", "xl", "xu")
+        self.var_table = tb.TableView(self, columns=var_columns, show="headings", height=20)
+        self.var_table.grid(row=3, column=0, padx=(10, 0), pady=(0, 10), sticky="wnse")
+
+        self.var_table.heading("var", text='Var')
+        self.var_table.heading("xl", text='Lower lim')
+        self.var_table.heading("xu", text='Higher lim')
+
+        obj_columns = ("obj", "equation")
+        self.obj_table = tb.TableView(self, columns=obj_columns, show="headings", height=20)
+        self.obj_table.grid(row=3, column=1, padx=(10, 0), pady=(0, 10), sticky="wnse")
+
+        self.obj_table.heading("obj", text='Objective')
+        self.obj_table.heading("equation", text='Function')
+
+        constr_columns = ("constr", "equation")
+        self.constr_table = tb.TableView(self, columns=constr_columns, show="headings", height=20)
+        self.constr_table.grid(row=3, column=2, padx=(10, 10), pady=(0, 10), sticky="wnse")
+
+        self.constr_table.heading("constr", text='Constrain')
+        self.constr_table.heading("equation", text='Function')
+
+
+    def var_cnt_changed(self, event):
+        pass
+
+    def obj_cnt_changed(self, event):
+        pass
+
+    def constr_cnt_changed(self, event):
+        pass
 
 class SolutionFrame(customtkinter.CTkFrame):
     """This class implements solution output
@@ -59,18 +111,64 @@ class SolutionFrame(customtkinter.CTkFrame):
         self.solve_button = customtkinter.CTkButton(self, text="Optimize", command=self.button_callbck)
         self.solve_button.grid(row=6, column=0, rowspan=1, padx=30, pady=10, sticky="wsne")
 
-        # self.checkbox_1 = customtkinter.CTkCheckBox(self, text="checkbox 1")
-        # self.checkbox_1.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="w")
-
-        # self.button = customtkinter.CTkButton(self, text="my button", command=self.button_callbck2)
-        # self.button.grid(row=1, column=0, padx=20, pady=20)
-
     def button_callbck(self):
-        # TODO: call solver
+        # Lock button
         self.solve_button.configure(state="disabled")
-        self.result_label.configure(text=f"Placeholder")
-        self.solve_button.configure(state="normal")
-        pass
+
+        try:
+            # Report state
+            self.result_label.configure(text=f"Calculation running")
+
+            # Initialize problem variables
+            problem_config = core.ProblemConfiguration()
+            # TODO: pull config
+
+            algo_config = core.AlgorithmConfiguration()
+            # TODO: pull config
+
+            opt_config = core.OptimizationConfiguration()
+            # TODO: pull config
+
+            # Instanciating object of problem class
+            problem = core.Problem(problem_config)
+
+            # Creating algorithm for optimization
+            algorithm = core.init_algo(algo_config)
+
+            # Creating termination criteria
+            termination = core.get_termination("n_gen", opt_config.termination_n_gen)
+
+            # Applying optimization (produces set of solutions)
+            res = core.minimize(problem,
+                       algorithm,
+                       termination,
+                       seed=1,
+                       save_history=opt_config.save_history,
+                       verbose=opt_config.verbose)
+            
+            # Storing solutions to variables
+            X = res.X
+            F = res.F
+
+            # Normalization
+            approx_ideal = F.min(axis=0)
+            approx_nadir = F.max(axis=0)
+            nF = (F - approx_ideal) / (approx_nadir - approx_ideal)
+
+            # Selecting single solution based on weights
+            weights = opt_config.weights
+            decomp = ASF()
+            idx = decomp.do(nF, 1/weights).argmin()       # index of selected solution
+            
+            self.result_label.configure(text=f"Best regarding ASF: \nidx = {idx}\nX = {X[idx]}\nF = {F[idx]}")
+
+            # Visualizing
+            core.visualize(problem, X, F, idx)
+        
+        except Exception as ex:
+            print(f"{colorama.Fore.RED}{ex}")
+        finally:
+            self.solve_button.configure(state="normal")
 
 class AlgorithmFrame(customtkinter.CTkFrame):
     """This class implements algorithm configuration
@@ -174,16 +272,12 @@ class GuiApp(customtkinter.CTk):
         customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
 
         # Set name of programm and size
-        self.title("Multicriteria optimization demonstrator")
+        self.title("Multicriteria optimization demonstrator (MVP)")
         self.geometry("900x700")
 
         # Configure layout
-        # self.grid_columnconfigure(1, weight=1)
-        # self.grid_columnconfigure((2, 3), weight=0)
-
         self.grid_columnconfigure((0, 1, 2, 3, 4), weight=1)
         self.grid_rowconfigure((1, 2, 3, 4, 5, 6), weight=1)
-
 
         # self.tab_view = MyTabView(master=self)
         # self.tab_view.grid(row=0, column=0, padx=20, pady=20)
