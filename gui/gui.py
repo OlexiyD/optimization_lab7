@@ -57,9 +57,9 @@ class ProblemFrame(customtkinter.CTkFrame):
         self.var_table = tb.TableView(self, columns=var_columns, show="headings", height=6)
         self.var_table.grid(row=3, column=0, padx=(10, 0), pady=(0, 10), sticky="wnse")
 
-        self.var_table.column("var",anchor=CENTER, stretch=NO, width=40)
-        self.var_table.column("xl",anchor=CENTER, width=80)
-        self.var_table.column("xu",anchor=CENTER, width=80)
+        self.var_table.column("var", anchor=CENTER, stretch=NO, width=40)
+        self.var_table.column("xl", anchor=CENTER, width=80)
+        self.var_table.column("xu", anchor=CENTER, width=80)
 
         self.var_table.heading("var", text='Var')
         self.var_table.heading("xl", text='Lower lim')
@@ -69,8 +69,8 @@ class ProblemFrame(customtkinter.CTkFrame):
         self.obj_table = tb.TableView(self, columns=obj_columns, show="headings", height=6)
         self.obj_table.grid(row=3, column=1, padx=(10, 0), pady=(0, 10), sticky="wnse")
 
-        self.obj_table.column("obj",anchor=CENTER, stretch=NO, width=65)
-        self.obj_table.column("equation",anchor=CENTER, width=50)
+        self.obj_table.column("obj", anchor=CENTER, stretch=NO, width=65)
+        self.obj_table.column("equation", anchor=CENTER, width=50)
 
         self.obj_table.heading("obj", text='Objective')
         self.obj_table.heading("equation", text='Function')
@@ -79,25 +79,34 @@ class ProblemFrame(customtkinter.CTkFrame):
         self.constr_table = tb.TableView(self, columns=constr_columns, show="headings", height=6)
         self.constr_table.grid(row=3, column=2, padx=(10, 10), pady=(0, 10), sticky="wnse")
 
-        self.constr_table.column("constr",anchor=CENTER, stretch=NO, width=60)
-        self.constr_table.column("equation",anchor=CENTER, width=50)
+        self.constr_table.column("constr", anchor=CENTER, stretch=NO, width=60)
+        self.constr_table.column("equation", anchor=CENTER, width=50)
 
         self.constr_table.heading("constr", text='Constrain')
         self.constr_table.heading("equation", text='Function')
 
-        self.var_table.insert('', END, iid = 0, values = ["x0", 1, 2])
-        self.obj_table.insert('', END, iid = 0, values = ["f0", "x0 + x0 + 2*x0 + x0 + x0 + 2*x0"])
-        self.constr_table.insert('', END, iid = 0, values = ["f0", "x0 + x0 + 2*x0 + x0 + x0 + 2*x0"])
 
-
-    def var_cnt_changed(self, event):
-        pass
+    def var_cnt_changed(self, event):       
+        # Initialize appropriate number of rows
+        self.fill_table(self.var_table, "x", int(self.var_entry.get()))
 
     def obj_cnt_changed(self, event):
+        # Initialize appropriate number of rows
+        self.fill_table(self.obj_table, "f", int(self.obj_entry.get()))
         pass
 
     def constr_cnt_changed(self, event):
+        # Initialize appropriate number of rows
+        self.fill_table(self.constr_table, "g", int(self.constr_entry.get()))
         pass
+
+    def fill_table(self, table: tb.TableView, var_name: str, cnt: int):
+        # Clear current table andd adds empty rows
+        for item in table.get_children():
+           table.delete(item)
+
+        for i in range(cnt):
+            table.insert('', END, iid = i, values = [f"{var_name}{i}", "", ""])
 
 class SolutionFrame(customtkinter.CTkFrame):
     """This class implements solution output
