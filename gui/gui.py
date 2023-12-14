@@ -40,16 +40,24 @@ class SolutionFrame(customtkinter.CTkFrame):
         var (int):          N
 
     Methods:
-        method:             N
+        button_callbck:     Optimize problem
     """
 
     def __init__(self, master, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
         self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure((1, 2, 3, 4, 5, 6), weight=1)
 
         self.frame_label = customtkinter.CTkLabel(self, text="Solution", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.frame_label.grid(row=0, column=0, padx=20, pady=10, sticky="wne")
+
+        self.result_label = customtkinter.CTkLabel(self, text="Solution", font=customtkinter.CTkFont(size=16), 
+                                                   fg_color="grey", text_color="black", corner_radius=10, anchor="nw")
+        self.result_label.grid(row=1, column=0, rowspan=5, padx=10, pady=0, sticky="wsne")
+
+        self.solve_button = customtkinter.CTkButton(self, text="Optimize", command=self.button_callbck)
+        self.solve_button.grid(row=6, column=0, rowspan=1, padx=30, pady=10, sticky="wsne")
 
         # self.checkbox_1 = customtkinter.CTkCheckBox(self, text="checkbox 1")
         # self.checkbox_1.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="w")
@@ -57,8 +65,12 @@ class SolutionFrame(customtkinter.CTkFrame):
         # self.button = customtkinter.CTkButton(self, text="my button", command=self.button_callbck2)
         # self.button.grid(row=1, column=0, padx=20, pady=20)
 
-    # def button_callbck2(self):
-    #     print("button clicked !!!!")
+    def button_callbck(self):
+        # TODO: call solver
+        self.solve_button.configure(state="disabled")
+        self.result_label.configure(text=f"Placeholder")
+        self.solve_button.configure(state="normal")
+        pass
 
 class AlgorithmFrame(customtkinter.CTkFrame):
     """This class implements algorithm configuration
@@ -107,17 +119,8 @@ class StatusFrame(customtkinter.CTkFrame):
         self.frame_label.grid(row=0, column=0, padx=20, pady=10, sticky="wne")
 
         # Create textbox
-        self.textbox = customtkinter.CTkTextbox(self, font=("Helvetica", 18))
+        self.textbox = customtkinter.CTkTextbox(self, font=customtkinter.CTkFont(size=16), fg_color="grey")
         self.textbox.grid(row=1, column=0, padx=10, pady=(0, 10), sticky="nsew")
-
-        # self.checkbox_1 = customtkinter.CTkCheckBox(self, text="checkbox 1")
-        # self.checkbox_1.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="w")
-
-        # self.button = customtkinter.CTkButton(self, text="my button", command=self.button_callbck2)
-        # self.button.grid(row=1, column=0, padx=20, pady=20)
-
-    # def button_callbck2(self):
-    #     print("button clicked !!!!")
 
 class TopFrame(customtkinter.CTkFrame):
     """This class implements output
@@ -179,7 +182,7 @@ class GuiApp(customtkinter.CTk):
         # self.grid_columnconfigure((2, 3), weight=0)
 
         self.grid_columnconfigure((0, 1, 2, 3, 4), weight=1)
-        self.grid_rowconfigure((1, 2, 3, 4, 5), weight=1)
+        self.grid_rowconfigure((1, 2, 3, 4, 5, 6), weight=1)
 
 
         # self.tab_view = MyTabView(master=self)
@@ -190,22 +193,22 @@ class GuiApp(customtkinter.CTk):
         self.top_row_frame.grid(row=0, column=0, columnspan=5, padx=0, pady=0, sticky="ew")
 
         self.problem_frame = ProblemFrame(self)
-        self.problem_frame.grid(row=1, column=0, rowspan=3, columnspan=3, padx=(10, 5), pady=(10, 5), sticky="nswe")
+        self.problem_frame.grid(row=1, column=0, rowspan=5, columnspan=3, padx=(10, 5), pady=(10, 5), sticky="nswe")
 
         self.algorithm_frame = AlgorithmFrame(self)
-        self.algorithm_frame.grid(row=4, column=0, rowspan=2, columnspan=3, padx=(10, 5), pady=(5, 10), sticky="nswe")
+        self.algorithm_frame.grid(row=6, column=0, rowspan=1, columnspan=3, padx=(10, 5), pady=(5, 10), sticky="nswe")
 
         self.solution_frame = SolutionFrame(self)
-        self.solution_frame.grid(row=1, column=3, rowspan=3, columnspan=2, padx=(5, 10), pady=(10, 5), sticky="nswe")
+        self.solution_frame.grid(row=1, column=3, rowspan=5, columnspan=2, padx=(5, 10), pady=(10, 5), sticky="nswe")
 
         self.status_frame = StatusFrame(self)
-        self.status_frame.grid(row=4, column=3, rowspan=2, columnspan=2, padx=(5, 10), pady=(5, 10), sticky="nswe")
+        self.status_frame.grid(row=6, column=3, rowspan=1, columnspan=2, padx=(5, 10), pady=(5, 10), sticky="nswe")
 
-        # TODO: redirect to log box
+        # Redirect standart output to log box
         sys.stdout = hp.StdoutRedirector(self.status_frame.textbox)
 
-        self.button = customtkinter.CTkButton(self, text="my button", command=self.button_callbck)
-        self.button.grid(row=1, column=0, padx=20, pady=20)
+        # self.button = customtkinter.CTkButton(self, text="my button", command=self.button_callbck)
+        # self.button.grid(row=1, column=0, padx=20, pady=20)
 
     def button_callbck(self):
         print("\x1b[31mbutton clicked")
