@@ -12,6 +12,7 @@ from pymoo.util.ref_dirs import get_reference_directions
 from pymoo.decomposition.asf import ASF
 
 import matplotlib.pyplot as plt
+import colorama
 
 from dataclasses import dataclass
 from typing import Callable
@@ -170,7 +171,8 @@ def visualize(problem: Problem, X: np.ndarray, F: np.ndarray, solution_idx: int)
             plt.title("Design Space")
             plt.grid(visible=True)
         case 3:
-            # TODO: unoperational
+            # TODO: unoperational, test
+            plt.axes(projection ='3d')
             plt.scatter(X[:, 0], X[:, 1], X[:, 1], s=30, facecolors='none', edgecolors='r')
             plt.scatter(X[solution_idx, 0], X[solution_idx, 1], X[solution_idx, 1], marker="x", color="green", s=200)
             plt.xlim(xl[0], xu[0])
