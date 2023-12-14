@@ -15,7 +15,7 @@ class StdoutRedirector(object):
         if (string[0] == '\x1b'):
             color_code = string[0:5]
             string = string.replace(color_code, '')
-            self.text_space.configure(fg=self.colors[color_code])
+            self.text_space.configure(text_color=self.colors[color_code])
 
         # Display text
         self.text_space.insert('end', string)

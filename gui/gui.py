@@ -1,4 +1,4 @@
-from sys import stdout
+import sys
 from tkinter import *
 import customtkinter
 import core.core as core
@@ -101,9 +101,14 @@ class StatusFrame(customtkinter.CTkFrame):
         super().__init__(master, *args, **kwargs)
 
         self.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=1)
 
         self.frame_label = customtkinter.CTkLabel(self, text="Status", font=customtkinter.CTkFont(size=20, weight="bold"))
         self.frame_label.grid(row=0, column=0, padx=20, pady=10, sticky="wne")
+
+        # Create textbox
+        self.textbox = customtkinter.CTkTextbox(self, font=("Helvetica", 18))
+        self.textbox.grid(row=1, column=0, padx=10, pady=(0, 10), sticky="nsew")
 
         # self.checkbox_1 = customtkinter.CTkCheckBox(self, text="checkbox 1")
         # self.checkbox_1.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="w")
@@ -184,27 +189,24 @@ class GuiApp(customtkinter.CTk):
         self.top_row_frame = TopFrame(self, height=20, corner_radius=0)
         self.top_row_frame.grid(row=0, column=0, columnspan=5, padx=0, pady=0, sticky="ew")
 
-        # TODO: bad layout
         self.problem_frame = ProblemFrame(self)
-        self.problem_frame.grid(row=1, column=0, rowspan=3, columnspan=3, padx=10, pady=(10, 5), sticky="nswe")
+        self.problem_frame.grid(row=1, column=0, rowspan=3, columnspan=3, padx=(10, 5), pady=(10, 5), sticky="nswe")
 
         self.algorithm_frame = AlgorithmFrame(self)
-        self.algorithm_frame.grid(row=4, column=0, rowspan=2, columnspan=3, padx=10, pady=(5, 10), sticky="nswe")
+        self.algorithm_frame.grid(row=4, column=0, rowspan=2, columnspan=3, padx=(10, 5), pady=(5, 10), sticky="nswe")
 
         self.solution_frame = SolutionFrame(self)
-        self.solution_frame.grid(row=1, column=3, rowspan=3, columnspan=2, padx=10, pady=(10, 5), sticky="nswe")
+        self.solution_frame.grid(row=1, column=3, rowspan=3, columnspan=2, padx=(5, 10), pady=(10, 5), sticky="nswe")
 
         self.status_frame = StatusFrame(self)
-        self.status_frame.grid(row=4, column=3, rowspan=2, columnspan=2, padx=10, pady=(5, 10), sticky="nswe")
+        self.status_frame.grid(row=4, column=3, rowspan=2, columnspan=2, padx=(5, 10), pady=(5, 10), sticky="nswe")
 
         # TODO: redirect to log box
-        # self.text_box = Text(self.parent, wrap='word', height = 11, width=50)
-        # self.text_box.grid(column=0, row=0, columnspan = 2, sticky='NSWE', padx=5, pady=5)
-        # sys.stdout = StdoutRedirector(self.text_box)
+        sys.stdout = hp.StdoutRedirector(self.status_frame.textbox)
 
-        # self.button = customtkinter.CTkButton(self, text="my button", command=self.button_callbck)
-        # self.button.grid(row=1, column=0, padx=20, pady=20)
+        self.button = customtkinter.CTkButton(self, text="my button", command=self.button_callbck)
+        self.button.grid(row=1, column=0, padx=20, pady=20)
 
     def button_callbck(self):
-        print("button clicked")
+        print("\x1b[31mbutton clicked")
         
