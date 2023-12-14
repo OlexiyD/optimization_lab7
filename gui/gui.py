@@ -1,4 +1,6 @@
 import sys
+import numpy as np
+from sympy import lambdify
 import colorama
 from tkinter import *
 import customtkinter
@@ -65,15 +67,17 @@ class ProblemFrame(customtkinter.CTkFrame):
         self.var_table.heading("xl", text='Lower lim')
         self.var_table.heading("xu", text='Higher lim')
 
-        obj_columns = ("obj", "equation")
+        obj_columns = ("obj", "equation", "weight")
         self.obj_table = tb.TableView(self, columns=obj_columns, show="headings", height=6)
         self.obj_table.grid(row=3, column=1, padx=(10, 0), pady=(0, 10), sticky="wnse")
 
         self.obj_table.column("obj", anchor=CENTER, stretch=NO, width=65)
         self.obj_table.column("equation", anchor=CENTER, width=50)
+        self.obj_table.column("weight", anchor=CENTER, stretch=NO, width=50)
 
         self.obj_table.heading("obj", text='Objective')
         self.obj_table.heading("equation", text='Function')
+        self.obj_table.heading("weight", text='Weight')
 
         constr_columns = ("constr", "equation")
         self.constr_table = tb.TableView(self, columns=constr_columns, show="headings", height=6)
@@ -144,13 +148,40 @@ class SolutionFrame(customtkinter.CTkFrame):
 
             # Initialize problem variables
             problem_config = core.ProblemConfiguration()
-            # TODO: pull config
+            problem_config.n_var = int(self.master.problem_frame.var_entry.get())
+            problem_config.n_obj = int(self.master.problem_frame.obj_entry.get())
+            problem_config.n_ieq_constr = int(self.master.problem_frame.constr_entry.get())
+            problem_config.xl = np.array([-2, -2])
+            problem_config.xu = np.array([2, 2])
+            f1 = lambdify(['x0', 'x1'], "100 * (x0**2 + x1**2)")
+            # f2 = (x[0]-1)**2 + x[1]**2
+            f2 = lambdify(['x0', 'x1'], "(x0-1)**2 + x1**2")
+
+            # g1 = 2*(x[0]-0.1) * (x[0]-0.9) / 0.18
+            g1 = lambdify(['x0', 'x1'], "2*(x0-0.1) * (x0-0.9) / 0.18")
+            # g2 = - 20*(x[0]-0.4) * (x[0]-0.6) / 4.8
+            g2 = lambdify(['x0', 'x1'], "- 20*(x0-0.4) * (x0-0.6) / 4.8")
+
+            problem_config.objective_fcn = [f1, f2]
+            problem_config.constrains = [g1, g2]
+            # TODO: implement transition
 
             algo_config = core.AlgorithmConfiguration()
-            # TODO: pull config
+            algo_config.algo_type = "CTAEA"
+            algo_config.n_obj = problem_config.n_obj
+            algo_config.n_partitions = 12
+            algo_config.n_points = 90
+            algo_config.ref_dirs_type = "uniform"
+            algo_config.pop_size = 40
+            algo_config.eliminate_duplicates = True
+            # TODO: implement transition
 
             opt_config = core.OptimizationConfiguration()
-            # TODO: pull config
+            opt_config.termination_n_gen = 60 # Hardcoded
+            opt_config.save_history = False
+            opt_config.verbose = False
+            opt_config.weights = np.array([0.2, 0.8])
+            # TODO: implement transition
 
             # Instanciating object of problem class
             problem = core.Problem(problem_config)
